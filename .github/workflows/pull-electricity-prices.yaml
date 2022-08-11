@@ -1,0 +1,25 @@
+name: Pull electricity prices
+on:
+  schedule:
+    - cron: "15 12 * * *"
+
+jobs:
+  pull-electricity-prices:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run script to pull electricity prices
+        run: |
+          tomorrow=$(date --date="tomorrow" -Idate); echo "[
+            $(curl -s https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN1),
+            $(curl -s https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN2),
+            $(curl -s https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN3),
+            $(curl -s https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN4)
+          ]" | jq -r '. | transpose | map({timestamp: .[0].TimeStamp, SE1: .[0].Value, SE2: .[1].Value, SE3: .[2].Value, SE4: .[3].Value}) | (.[0] | keys_unsorted) as $keys | map([.[ $keys[] ]])[] | @csv' >> elpriser.csv
+
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+          with:
+            commit_message: Pull electricity prices
