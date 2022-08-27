@@ -15,8 +15,8 @@ jobs:
         run: |
           tomorrow=$(date --date="tomorrow" -Idate)
           SE1=$(curl -v https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN1)
-          SE2=$(curl -v https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN2)
-          SE3=$(curl -v https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN3)
+          SE2=$(curl -v -A 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1' https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN2)
+          SE3=$(curl -v -A 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1' https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN3)
           SE4=$(curl -v https://www.vattenfall.se/api/price/spot/pricearea/$tomorrow/$tomorrow/SN4)
 
           csv=$(echo "[]" | jq -r --argjson SE1 $SE1 --argjson SE2 $SE2 --argjson SE3 $SE3 --argjson SE4 $SE4 \
