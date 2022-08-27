@@ -1,0 +1,41 @@
+name: Deploy electricity prices to datasette instance
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  deploy-electricity-prices-to-datasette-instance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - uses: actions/cache@v2
+        name: Configure pip caching
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install datasette datasette-publish-vercel sqlite-utils
+
+      - name: Create database
+        run: sqlite-utils insert elpriser.db elpriser elpriser.csv --csv --detect-types
+
+      - name: Deploy Datasette using Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |-
+          datasette publish vercel elpriser.db \
+            --token $VERCEL_TOKEN \
+            --project elpriser \
+            --public
