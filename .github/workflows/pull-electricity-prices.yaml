@@ -1,7 +1,7 @@
 name: Pull electricity prices
 on:
   schedule:
-    - cron: "15 12 * * *"
+    - cron: "15 13 * * *"
   workflow_dispatch:
 
 jobs:
