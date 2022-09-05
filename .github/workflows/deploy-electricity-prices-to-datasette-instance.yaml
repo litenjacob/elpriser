@@ -2,6 +2,10 @@ name: Deploy electricity prices to datasette instance
 on:
   push:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Pull electricity prices"]
+    types:
+      - completed
 
 jobs:
   deploy-electricity-prices-to-datasette-instance:
